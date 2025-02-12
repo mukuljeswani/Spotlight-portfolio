@@ -1,7 +1,14 @@
 import React from 'react'
 
-export default function About() {
+const About = () => {
   return (
-    <div>About</div>
-  )
-}
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold">About</h2>
+      <p className="text-gray-400">
+        About description      
+      </p>
+    </div>
+  );
+};
+
+export default About;
