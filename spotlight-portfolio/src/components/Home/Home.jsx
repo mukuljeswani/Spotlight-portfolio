@@ -1,12 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import About from '../About/About';
 import Projects from '../Projects/Projects';
 import Experience from '../Experience/Experience';
+import Blog from '../Blog/Blog';
 import Sidebar from '../Sidebar/Sidebar';
+import ThemeToggle from '../ThemeToggle/ThemeToggle';
+import { FiMenu, FiX } from 'react-icons/fi';
 import './Home.css';
+import { FaGithub, FaLinkedin } from 'react-icons/fa';
 
 const Home = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [menuAnimationClass, setMenuAnimationClass] = useState('');
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      setMenuAnimationClass('slide-in');
+      document.body.style.overflow = 'hidden';
+    } else {
+      setMenuAnimationClass('slide-out');
+      document.body.style.overflow = 'auto';
+    }
+  }, [isMobileMenuOpen]);
 
   const handleMouseMove = (e) => {
     setMousePosition({
@@ -15,11 +45,23 @@ const Home = () => {
     });
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    if (isMobile) {
+      setIsMobileMenuOpen(false);
+    }
+  };
+
   return (
     <div 
       className="home-container"
       onMouseMove={handleMouseMove}
     >
+      <ThemeToggle />
+      
       <div 
         className="spotlight-effect"
         style={{
@@ -27,21 +69,50 @@ const Home = () => {
         }}
       />
 
-      <div className="sidebar-wrapper">
-        <Sidebar />
-      </div>
+      {isMobile && (
+        <div className="mobile-header-info">
+          <h1>Mukul Jeswani</h1>
+          <h2>Full Stack Engineer</h2>
+          <p>I build innovative solutions and optimize digital experiences across web and mobile platforms.</p>
+          <div className="mobile-social-links">
+            <a href="https://github.com/mukuljeswani" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+              <FaGithub />
+            </a>
+            <a href="https://www.linkedin.com/in/mukul-jeswani2211/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              <FaLinkedin />
+            </a>
+          </div>
+        </div>
+      )}
+
+      <button 
+        className="mobile-menu-toggle" 
+        onClick={toggleMobileMenu}
+        aria-label="Toggle menu"
+      >
+        {isMobileMenuOpen ? <FiX /> : <FiMenu />}
+      </button>
+
+      {(!isMobile || (isMobile && isMobileMenuOpen)) && (
+        <div className={`sidebar-wrapper ${isMobile ? 'mobile-nav-only' : ''} ${menuAnimationClass}`}>
+          <Sidebar closeMobileMenu={closeMobileMenu} hideBasicInfoOnMobile={isMobile} />
+        </div>
+      )}
 
       <div className="main-content">
         <div className="content-wrapper">
-          <section className="content-section">
+          <section className="content-section" id="about">
+            <h2 className="section-heading">About</h2>
             <About />
           </section>
 
-          <section className="content-section">
+          <section className="content-section" id="experience">
+            <h2 className="section-heading">Experience</h2>
             <Experience />
           </section>
 
-          <section className="content-section">
+          <section className="content-section" id="projects">
+            <h2 className="section-heading">Projects</h2>
             <Projects />
           </section>
         </div>

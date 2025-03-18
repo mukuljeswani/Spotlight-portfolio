@@ -1,30 +1,96 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import './Sidebar.css';
 
-const Sidebar = () => {
+const Sidebar = ({ closeMobileMenu, hideBasicInfoOnMobile }) => {
+  const [activeSection, setActiveSection] = useState('about');
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ['about', 'experience', 'projects'
+        // , 'blog'
+      ];
+      const scrollPosition = window.scrollY + 100;
+
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleNavClick = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      if (closeMobileMenu) {
+        closeMobileMenu();
+      }
+    }
+  };
+
   return (
     <div className="sidebar">
-      <div className="sidebar-header">
-        <h1>Mukul Jeswani</h1>
-        <h2>FrontEnd Engineer</h2>
-        <p>I build fun projects</p>
-      </div>
+      {!hideBasicInfoOnMobile && (
+        <div className="sidebar-content">
+          <div className="sidebar-header">
+            <h1>Mukul Jeswani</h1>
+            <h2>Full Stack Engineer</h2>
+            <p>I build innovative solutions and optimize digital experiences across web and mobile platforms.</p>
+          </div>
+          
+          <div className="social-links">
+            <a href="https://github.com/mukuljeswani" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="GitHub">
+              <FaGithub className="social-icon" />
+            </a>
+            <a href="https://www.linkedin.com/in/mukul-jeswani2211/" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="LinkedIn">
+              <FaLinkedin className="social-icon" />
+            </a>
+          </div>
+        </div>
+      )}
       
-      <nav className="sidebar-nav">
+      <nav className={`sidebar-nav ${hideBasicInfoOnMobile ? 'mobile-nav-only' : ''}`}>
         <ul>
-          <li>ABOUT</li>
-          <li>EXPERIENCE</li>
-          <li>PROJECTS</li>
+          <li 
+            className={`nav-item ${activeSection === 'about' ? 'active' : ''}`}
+            onClick={() => handleNavClick('about')}
+          >
+            <div className="nav-line"></div>
+            ABOUT
+          </li>
+          <li 
+            className={`nav-item ${activeSection === 'experience' ? 'active' : ''}`}
+            onClick={() => handleNavClick('experience')}
+          >
+            <div className="nav-line"></div>
+            EXPERIENCE
+          </li>
+          <li 
+            className={`nav-item ${activeSection === 'projects' ? 'active' : ''}`}
+            onClick={() => handleNavClick('projects')}
+          >
+            <div className="nav-line"></div>
+            PROJECTS
+          </li>
+          {/* <li 
+            className={`nav-item ${activeSection === 'blog' ? 'active' : ''}`}
+            onClick={() => handleNavClick('blog')}
+          >
+            <div className="nav-line"></div>
+            BLOGS
+          </li> */}
         </ul>
       </nav>
-
-      <div className="sidebar-footer">
-        <div className="social-links">
-          <a href="#">GitHub</a>
-          <a href="#">LinkedIn</a>
-          {/* <a href="#">CodePen</a> */}
-        </div>
-      </div>
     </div>
   );
 };
